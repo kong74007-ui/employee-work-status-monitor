@@ -1,0 +1,15 @@
+{
+  "name": "employee-work-status-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LAN employee work status monitor with screenshot upload and GLM visual analysis.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:manager": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
+

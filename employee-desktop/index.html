@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>员工状态上报</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <h1>员工状态上报</h1>
+          <p>系统按工作时段自动上报，无需手动上传</p>
+          <strong id="scheduleRule">00:00 - 24:00 · 每 30 分钟一次</strong>
+        </div>
+        <div class="status-pill">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="statusText">准备中</span>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card primary">
+          <span class="caption">下次自动上报</span>
+          <strong id="nextUpload">准备中</strong>
+          <small id="activeWindow">工作时段 00:00 - 24:00</small>
+        </article>
+
+        <article class="card">
+          <h2>员工信息</h2>
+          <dl>
+            <dt>员工</dt>
+            <dd id="employeeName">-</dd>
+            <dt>部门</dt>
+            <dd id="department">-</dd>
+          </dl>
+        </article>
+
+        <article class="card wide">
+          <h2>连接信息</h2>
+          <dl>
+            <dt>主管端地址</dt>
+            <dd id="serverUrl">-</dd>
+          </dl>
+        </article>
+
+        <article class="card compact">
+          <span class="caption">最近上报</span>
+          <strong id="lastUpload">暂无</strong>
+        </article>
+
+        <article class="card compact">
+          <span class="caption">运行状态</span>
+          <strong id="runningNote">已自动开启，可隐藏到托盘</strong>
+        </article>
+      </section>
+
+      <section id="profileEditor" class="profile-editor" hidden>
+        <div class="profile-panel">
+          <h2>修改个人信息</h2>
+          <label>
+            员工ID
+            <input id="profileEmployeeId" type="text" autocomplete="off" />
+          </label>
+          <label>
+            姓名
+            <input id="profileEmployeeName" type="text" autocomplete="off" />
+          </label>
+          <label>
+            部门
+            <input id="profileDepartment" type="text" autocomplete="off" />
+          </label>
+          <p id="profileError" class="profile-error"></p>
+          <div class="profile-actions">
+            <button id="cancelProfileBtn" type="button">取消</button>
+            <button id="saveProfileBtn" type="button">保存</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="actions">
+        <button id="editProfileBtn" type="button">修改信息</button>
+        <button id="uploadNowBtn" class="upload-action" type="button">立即上报</button>
+        <button id="startBtn" type="button">开始</button>
+        <button id="hideBtn" type="button">隐藏</button>
+      </footer>
+    </main>
+    <script src="./renderer.js"></script>
+  </body>
+</html>

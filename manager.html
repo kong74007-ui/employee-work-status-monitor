@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>员工工作状态分析看板</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="manager.css?v=20260708-paused-status1" />
+  </head>
+  <body>
+    <div class="manager-shell">
+      <div class="ambient-stream" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <header class="manager-header">
+        <div class="monitor-wave" aria-label="实时心跳消息">
+          <span class="wave-line" aria-hidden="true"></span>
+        </div>
+        <div class="title-block">
+          <h1>员工工作状态分析看板</h1>
+          <div class="live-chip" aria-label="实时监控状态">
+            <span></span>
+            实时监控中
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="openBroadcastBtn" class="ghost-action broadcast-entry" type="button">通知全员</button>
+          <button id="openScreenshotsBtn" class="ghost-action" type="button">今日截图</button>
+          <button id="refreshBtn" class="primary-action" type="button">刷新</button>
+          <span id="headerClock" class="header-clock"></span>
+          <span id="lastRefresh" class="muted"></span>
+        </div>
+      </header>
+
+      <section class="announcement-row" aria-label="公告通知">
+        <div class="announcement-banner">
+          <span class="announcement-icon" aria-hidden="true">🔊</span>
+          <div class="announcement-viewport">
+            <span class="announcement-track">
+              公告通知：当前页面为员工工作状态监控测试版，请关注员工上报状态、异常提醒和统计图表变化。
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="manager-metrics" id="managerMetrics"></section>
+
+      <section class="manager-layout">
+        <main class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>3 · 员工工作状态信息</h3>
+            </div>
+            <div class="manager-filter">
+              <input id="managerSearch" type="search" placeholder="搜索姓名、部门、电脑名" />
+              <select id="managerStatus">
+                <option value="all">全部状态</option>
+                <option value="online">正常</option>
+                <option value="late">延迟</option>
+                <option value="offline">离线</option>
+              </select>
+            </div>
+          </div>
+          <div class="snapshot-grid" id="snapshotGrid"></div>
+        </main>
+
+        <aside class="panel screenshot-detail" id="screenshotDetail"></aside>
+
+        <div class="panel chart-section">
+          <div class="panel-header">
+            <div>
+              <h3>5 · 工作统计图表</h3>
+            </div>
+          </div>
+          <div class="chart-grid">
+            <article class="chart-card">
+              <div class="chart-title">
+                <h4>状态分布</h4>
+                <span class="muted">正常 / 延迟 / 离线</span>
+              </div>
+              <canvas id="statusChart" width="360" height="220"></canvas>
+            </article>
+            <article class="chart-card">
+              <div class="chart-title">
+                <h4>部门分布</h4>
+                <span class="muted">按员工所属部门</span>
+              </div>
+              <canvas id="departmentChart" width="360" height="220"></canvas>
+            </article>
+            <article class="chart-card">
+              <div class="chart-title">
+                <h4>上报趋势</h4>
+                <span class="muted">最近 8 次记录</span>
+              </div>
+              <canvas id="trendChart" width="360" height="220"></canvas>
+            </article>
+            <article class="chart-card">
+              <div class="chart-title">
+                <h4>分析置信度</h4>
+                <span class="muted">高 / 中 / 低</span>
+              </div>
+              <canvas id="confidenceChart" width="360" height="220"></canvas>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel recent-panel collapsed" id="recentPanel">
+        <div class="panel-header">
+          <div>
+            <h3>6 · 最近分析</h3>
+            <p>保留最近 500 条记录</p>
+          </div>
+          <button id="toggleRecentBtn" class="ghost-action" type="button">展开</button>
+        </div>
+        <div class="manager-timeline" id="managerTimeline"></div>
+      </section>
+    </div>
+
+    <dialog id="messageDialog" class="message-dialog">
+      <div class="message-dialog-head">
+        <button id="closeMessageDialog" class="message-close" type="button" aria-label="返回">‹</button>
+      </div>
+      <label class="message-token-field">
+        通信密钥
+        <input id="messageTokenInput" type="password" name="message-token-manual" placeholder="请输入主管端通信密钥" autocomplete="new-password" spellcheck="false" />
+      </label>
+      <div class="message-options" id="messageOptions"></div>
+      <div class="message-actions">
+        <span id="selectedMessageLabel" class="muted">请选择一条消息内容</span>
+        <button id="sendMessageBtn" class="primary-action" type="button">发送</button>
+      </div>
+    </dialog>
+
+    <dialog id="broadcastDialog" class="broadcast-dialog message-dialog">
+      <div class="message-dialog-head">
+        <div>
+          <h3>通知全员</h3>
+          <p class="muted">输入通信密钥和通知内容，消息会推送到所有已上报员工电脑右下角。</p>
+        </div>
+        <button id="closeBroadcastDialog" class="message-close" type="button" aria-label="返回">←</button>
+      </div>
+      <label class="message-token-field">
+        通信密钥
+        <input id="broadcastTokenInput" type="password" name="broadcast-token-manual" placeholder="请输入主管端通信密钥" autocomplete="new-password" spellcheck="false" />
+      </label>
+      <label class="broadcast-message-field">
+        通知内容
+        <textarea id="broadcastMessageInput" maxlength="300" placeholder="请输入要发送给所有员工的通知内容"></textarea>
+      </label>
+      <div class="message-actions">
+        <span id="broadcastFeedback" class="muted">最多 300 字，发送后员工端会在下次轮询时收到。</span>
+        <button id="sendBroadcastBtn" class="primary-action" type="button">广播</button>
+      </div>
+    </dialog>
+
+    <dialog id="screenshotDialog" class="screenshot-dialog">
+      <div class="screenshot-dialog-head">
+        <div>
+          <h3>今日员工截图</h3>
+          <p>输入查看密码后，只展示今天 00:00 之后收到的截图。</p>
+        </div>
+        <button id="closeScreenshotDialog" class="message-close" type="button" aria-label="关闭">←</button>
+      </div>
+      <div class="screenshot-auth">
+        <input id="screenshotPasswordInput" type="password" name="screenshot-password-manual" placeholder="请输入截图查看密码" autocomplete="new-password" spellcheck="false" />
+        <button id="loadScreenshotsBtn" class="primary-action" type="button">查看</button>
+        <span id="screenshotFeedback" class="muted"></span>
+      </div>
+      <div id="screenshotGrid" class="screenshot-grid"></div>
+      <div id="screenshotPreview" class="screenshot-preview" hidden>
+        <div class="screenshot-preview-panel">
+          <div class="screenshot-preview-head">
+            <div>
+              <strong id="screenshotPreviewTitle">截图预览</strong>
+              <span id="screenshotPreviewMeta"></span>
+            </div>
+            <button id="closeScreenshotPreview" class="message-close" type="button" aria-label="关闭预览">←</button>
+          </div>
+          <img id="screenshotPreviewImage" alt="截图预览" />
+        </div>
+      </div>
+    </dialog>
+
+    <script src="manager.js?v=20260708-no-autofill1"></script>
+  </body>
+</html>

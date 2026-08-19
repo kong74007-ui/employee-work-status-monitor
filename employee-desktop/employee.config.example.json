@@ -1,0 +1,14 @@
+{
+  "serverUrl": "http://manager-computer-ip:8787/api/snapshots",
+  "token": "replace-with-the-same-monitor-token",
+  "employeeId": "emp-001",
+  "employeeName": "张三",
+  "department": "研发部",
+  "intervalMinutes": 30,
+  "activeStartTime": "00:00",
+  "activeEndTime": "24:00",
+  "messagePollSeconds": 10,
+  "timeoutSeconds": 90,
+  "note": "员工端截图上报"
+}
+
